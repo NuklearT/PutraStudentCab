@@ -82,28 +82,27 @@ Open `src/main/webapp/META-INF/context.xml` and make sure it contains:
 ---
 
 ## 🏗️ Project Structure ##
-PutraStudentCab/
-
-├── src/main/java/com/upm/putrastudentcab/
-│   ├── ejb/
-│   │   ├── FareCalculatorBean.java      # Fare calculation logic
-│   │   ├── FareCalculatorLocal.java
-│   │   ├── TripServiceBean.java         # Persists trip to database
-│   │   └── TripServiceLocal.java
-│   ├── entity/
-│   │   └── Trip.java                    # JPA entity
-│   └── ws/
-│       ├── ApplicationConfig.java       # JAX-RS config
-│       └── FareResource.java            # REST endpoint POST /api/fare
-├── src/main/resources/META-INF/
-│   └── persistence.xml
-└── src/main/webapp/
-├── index.xhtml                      # Main UI (JSF + Leaflet.js)
-├── resources/js/map.js              # Map, search, routing logic
-├── META-INF/context.xml             # TomEE datasource config
-└── WEB-INF/
-├── beans.xml
-└── web.xml
+PutraStudentCab/\
+├── src/main/java/com/upm/putrastudentcab/\
+│   ├── ejb/\
+│   │   ├── FareCalculatorBean.java      # Fare calculation logic\
+│   │   ├── FareCalculatorLocal.java\
+│   │   ├── TripServiceBean.java         # Persists trip to database\
+│   │   └── TripServiceLocal.java\
+│   ├── entity/\
+│   │   └── Trip.java                    # JPA entity\
+│   └── ws/\
+│       ├── ApplicationConfig.java       # JAX-RS config\
+│       └── FareResource.java            # REST endpoint POST /api/fare\
+├── src/main/resources/META-INF/\
+│   └── persistence.xml\
+└── src/main/webapp/\
+├── index.xhtml                      # Main UI (JSF + Leaflet.js)\
+├── resources/js/map.js              # Map, search, routing logic\
+├── META-INF/context.xml             # TomEE datasource config\
+└── WEB-INF/\
+├── beans.xml\
+└── web.xml\
 
 ---
 
