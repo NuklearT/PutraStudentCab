@@ -102,7 +102,7 @@ PutraStudentCab/\
 ├── META-INF/context.xml             # TomEE datasource config\
 └── WEB-INF/\
 ├── beans.xml\
-└── web.xml\
+└── web.xml
 
 ---
 
