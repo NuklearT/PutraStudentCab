@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Confirm Your Ride — Putra Student Cab</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; color: #333; }
+
+        .app-header {
+            background: #1a5276; color: white; padding: 14px 24px;
+            font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 10px;
+        }
+        .back-link { color: #cfe2f3; text-decoration: none; font-size: 0.9rem; }
+
+        .booking-layout { display: flex; height: calc(100vh - 52px); }
+
+        .info-panel {
+            width: 380px; min-width: 340px; background: white;
+            padding: 24px 20px; display: flex; flex-direction: column; gap: 18px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.08); overflow-y: auto;
+        }
+
+        .driver-card {
+            display: flex; align-items: center; gap: 14px;
+            background: #f0f4f8; border-radius: 10px; padding: 14px;
+        }
+        .driver-avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #1a5276; color: white; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .driver-name { font-weight: 600; font-size: 1rem; }
+        .driver-meta { font-size: 0.8rem; color: #888; margin-top: 2px; }
+        .driver-rating { color: #f39c12; font-size: 0.85rem; margin-top: 2px; }
+
+        .eta-banner {
+            background: #eafaf1; border: 1.5px solid #a9dfbf;
+            border-radius: 8px; padding: 12px 14px; text-align: center;
+        }
+        .eta-banner .eta-value { font-size: 1.6rem; font-weight: 700; color: #1e8449; }
+        .eta-banner .eta-label { font-size: 0.78rem; color: #888; }
+
+        .route-summary { display: flex; flex-direction: column; gap: 10px; }
+        .route-point { display: flex; align-items: flex-start; gap: 10px; font-size: 0.88rem; }
+        .route-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+        .dot-origin { background: #27ae60; }
+        .dot-dest { background: #e74c3c; }
+        .route-text-label { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.4px; }
+
+        .trip-stats {
+            display: flex; justify-content: space-between;
+            background: #f0f4f8; border-radius: 8px; padding: 12px 14px; font-size: 0.85rem;
+        }
+        .trip-stats span { font-weight: 600; color: #1a5276; }
+
+        .fare-summary {
+            text-align: center; padding: 16px;
+            background: #fff8ec; border: 1.5px solid #f5d99b; border-radius: 10px;
+        }
+        .fare-summary .fare-amount { font-size: 2.2rem; font-weight: 700; color: #e67e22; }
+        .fare-summary .fare-label { font-size: 0.8rem; color: #888; margin-top: 2px; }
+
+        .btn { padding: 13px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+        .btn-confirm { background: #1e8449; color: white; }
+        .btn-confirm:hover { background: #196f3d; }
+        .btn-cancel { background: #ecf0f1; color: #555; }
+        .btn-cancel:hover { background: #dde1e4; }
+
+        .confirmed-banner {
+            display: none; text-align: center; padding: 14px;
+            background: #d5f5e3; border-radius: 8px; color: #1e8449; font-weight: 600;
+        }
+        .confirmed-banner.visible { display: block; }
+
+        #map { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <span>🚖 Confirm Your Ride</span>
+    </div>
+
+    <div class="booking-layout">
+        <div class="info-panel">
+
+            <a href="index.html" class="back-link">← Back to fare estimate</a>
+
+            <!-- Driver Info (dummy) -->
+            <div class="driver-card">
+                <div class="driver-avatar" id="driverInitials">AZ</div>
+                <div>
+                    <div class="driver-name" id="driverName">Ahmad Zikri</div>
+                    <div class="driver-meta" id="driverVehicle">Perodua Myvi · ABC 1234</div>
+                    <div class="driver-rating">⭐ 4.8 (132 rides)</div>
+                </div>
+            </div>
+
+            <!-- ETA -->
+            <div class="eta-banner">
+                <div class="eta-value" id="etaValue">5 min</div>
+                <div class="eta-label">Estimated arrival of your driver</div>
+            </div>
+
+            <!-- Route Summary -->
+            <div class="route-summary">
+                <div class="route-point">
+                    <span class="route-dot dot-origin"></span>
+                    <div>
+                        <div class="route-text-label">Pickup</div>
+                        <div id="originText">—</div>
+                    </div>
+                </div>
+                <div class="route-point">
+                    <span class="route-dot dot-dest"></span>
+                    <div>
+                        <div class="route-text-label">Destination</div>
+                        <div id="destText">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip Stats -->
+            <div class="trip-stats">
+                <div>Distance: <span id="distText">—</span> km</div>
+                <div>Duration: <span id="durText">—</span> min</div>
+            </div>
+
+            <!-- Fare -->
+            <div class="fare-summary">
+                <div class="fare-label">Total Fare</div>
+                <div class="fare-amount">RM <span id="fareText">—</span></div>
+            </div>
+
+            <button class="btn btn-confirm" type="button" onclick="confirmBooking()">Confirm Booking</button>
+            <button class="btn btn-cancel" type="button" onclick="window.location.href='index.html'">Cancel</button>
+
+            <div class="confirmed-banner" id="confirmedBanner">
+                ✅ Ride confirmed! Your driver is on the way.
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="resources/js/booking.js"></script>
+</body>
+</html>

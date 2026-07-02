@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Putra Student Cab</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; color: #333; }
+
+        .app-header {
+            background: #1a5276;
+            color: white;
+            padding: 14px 24px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-header a { color: #cfe2f3; text-decoration: none; font-size: 0.85rem; }
+
+        .main-layout {
+            display: flex;
+            height: calc(100vh - 52px);
+        }
+
+        /* ── LEFT PANEL ── */
+        .side-panel {
+            width: 340px;
+            min-width: 300px;
+            background: white;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+            z-index: 1000;
+            isolation: isolate;
+            overflow-y: visible;
+        }
+
+        .search-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+
+        .search-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+        }
+
+        .search-input-wrap {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid #dce0e8;
+            border-radius: 8px;
+            background: #f9fafc;
+            transition: border-color 0.2s;
+        }
+        .search-input-wrap:focus-within { border-color: #1a5276; background: white; }
+
+        .search-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+        .dot-origin { background: #27ae60; }
+        .dot-dest   { background: #e74c3c; }
+
+        .search-input-wrap input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 10px 10px 0;
+            font-size: 0.92rem;
+            outline: none;
+            color: #333;
+        }
+
+        .clear-btn {
+            background: none; border: none; cursor: pointer;
+            color: #aaa; font-size: 1rem; padding: 0 10px;
+            line-height: 1;
+        }
+        .clear-btn:hover { color: #555; }
+
+        /* Autocomplete dropdown */
+        .suggestions {
+            position: fixed;
+            background: white;
+            border: 1px solid #dce0e8;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            z-index: 9999;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+            width: 308px;
+        }
+        .suggestions.open { display: block; }
+
+        .suggestion-item {
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            line-height: 1.4;
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: #eaf2fb; }
+        .suggestion-item .place-name { font-weight: 500; color: #1a5276; }
+        .suggestion-item .place-detail { font-size: 0.78rem; color: #999; margin-top: 1px; }
+
+        .suggestion-item.loading,
+        .suggestion-item.no-result {
+            color: #aaa; cursor: default; font-style: italic;
+        }
+
+        /* Trip info */
+        .trip-info {
+            background: #f0f4f8;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.88rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+        .trip-info span { font-weight: 600; color: #1a5276; }
+
+        .hint {
+            font-size: 0.78rem;
+            color: #aaa;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.93rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-primary { background: #1a5276; color: white; }
+        .btn-primary:hover { background: #154360; }
+        .btn-primary:disabled { background: #a9bfd0; cursor: not-allowed; }
+        .btn-secondary { background: #ecf0f1; color: #555; }
+        .btn-secondary:hover { background: #dde1e4; }
+        .btn-book { background: #e67e22; color: white; }
+        .btn-book:hover { background: #d35400; }
+        .btn-book:disabled { background: #f0c9a0; cursor: not-allowed; }
+
+        .fare-result {
+            text-align: center;
+            padding: 14px;
+            background: #eafaf1;
+            border-radius: 8px;
+            border: 1.5px solid #a9dfbf;
+            display: none;
+        }
+        .fare-result.visible { display: block; }
+        .fare-result .fare-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e8449;
+        }
+        .fare-result .fare-label { font-size: 0.8rem; color: #888; margin-top: 2px; }
+
+        /* ── MAP ── */
+        #map { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <span>🚖 Putra Student Cab — Fare Estimator</span>
+        <a href="history.xhtml">📋 View Trip History</a>
+    </div>
+
+    <div class="main-layout">
+
+        <!-- Side Panel -->
+        <div class="side-panel">
+
+            <!-- Origin -->
+            <div class="search-group" id="originGroup">
+                <label>Pickup Location</label>
+                <div class="search-input-wrap">
+                    <span class="search-dot dot-origin"></span>
+                    <input type="text" id="originInput" placeholder="Search pickup point..."
+                           autocomplete="off"
+                           oninput="onSearchInput('origin')"
+                           onfocus="showDropdown('origin')"
+                           onblur="hideDropdown('origin')"/>
+                    <button class="clear-btn" type="button" onclick="clearPoint('origin')" title="Clear">✕</button>
+                </div>
+                <div class="suggestions" id="originSuggestions"></div>
+            </div>
+
+            <!-- Destination -->
+            <div class="search-group" id="destGroup">
+                <label>Destination</label>
+                <div class="search-input-wrap">
+                    <span class="search-dot dot-dest"></span>
+                    <input type="text" id="destInput" placeholder="Search destination..."
+                           autocomplete="off"
+                           oninput="onSearchInput('dest')"
+                           onfocus="showDropdown('dest')"
+                           onblur="hideDropdown('dest')"/>
+                    <button class="clear-btn" type="button" onclick="clearPoint('dest')" title="Clear">✕</button>
+                </div>
+                <div class="suggestions" id="destSuggestions"></div>
+            </div>
+
+            <p class="hint">Or click the map to set points directly</p>
+
+            <!-- Trip Info -->
+            <div class="trip-info">
+                <div>Distance: <span id="distanceLabel">—</span> km</div>
+                <div>Duration: <span id="durationLabel">—</span> min</div>
+            </div>
+
+            <!-- Actions -->
+            <button class="btn btn-primary" type="button" id="calcBtn" onclick="calculateFare()" disabled="disabled">
+                Calculate Fare
+            </button>
+            <button class="btn btn-secondary" type="button" onclick="resetSelection()">Reset</button>
+            <button class="btn btn-book" type="button" id="bookBtn" onclick="bookRide()" disabled="disabled">
+                🚗 Book Ride
+            </button>
+
+            <!-- Fare Result -->
+            <div class="fare-result" id="fareResult">
+                <div class="fare-label">Estimated Fare</div>
+                <div class="fare-amount">RM <span id="fareLabel">—</span></div>
+                <div class="fare-label">Based on distance and duration</div>
+            </div>
+
+        </div>
+
+        <!-- Map -->
+        <div id="map"></div>
+    </div>
+
+    <script src="resources/js/map.js"></script>
+</body>
+</html>

@@ -27,6 +27,8 @@ public class FareResource {
         trip.setOriginLng(req.originLng);
         trip.setDestLat(req.destLat);
         trip.setDestLng(req.destLng);
+        trip.setOriginLabel(req.originLabel);
+        trip.setDestLabel(req.destLabel);
         trip.setDistanceKm(req.distanceKm);
         trip.setDurationMin(req.durationMin);
         trip.setFare(fare);
@@ -39,6 +41,7 @@ public class FareResource {
 
     public static class FareRequest {
         public double originLat, originLng, destLat, destLng, distanceKm, durationMin;
+        public String originLabel, destLabel;
     }
     public static class FareResponse {
         public double fare;

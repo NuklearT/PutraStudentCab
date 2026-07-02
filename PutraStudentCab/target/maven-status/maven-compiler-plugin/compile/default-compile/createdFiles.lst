@@ -1,0 +1,12 @@
+com\upm\putrastudentcab\bean\TripHistoryBean.class
+com\upm\putrastudentcab\ejb\FareCalculatorLocal.class
+com\upm\putrastudentcab\ejb\FareCalculatorBean.class
+com\upm\putrastudentcab\ejb\TripServiceBean.class
+com\upm\putrastudentcab\entity\Trip.class
+com\upm\putrastudentcab\ws\FareResource$FareResponse.class
+com\upm\putrastudentcab\resources\JakartaEE10Resource.class
+com\upm\putrastudentcab\ws\FareResource$FareRequest.class
+com\upm\putrastudentcab\ejb\TripServiceLocal.class
+com\upm\putrastudentcab\ws\ApplicationConfig.class
+com\upm\putrastudentcab\JakartaRestConfiguration.class
+com\upm\putrastudentcab\ws\FareResource.class

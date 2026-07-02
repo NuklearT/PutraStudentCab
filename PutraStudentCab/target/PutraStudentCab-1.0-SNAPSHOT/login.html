@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Putra Student Cab — Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a5276, #2980b9);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 360px;
+            padding: 36px 32px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .login-header .logo { font-size: 2.2rem; }
+        .login-header h1 {
+            font-size: 1.25rem;
+            color: #1a5276;
+            margin-top: 8px;
+        }
+        .login-header p {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .field-group {
+            margin-bottom: 18px;
+        }
+        .field-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+        .field-group input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #dce0e8;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .field-group input:focus {
+            border-color: #1a5276;
+        }
+
+        .error-msg {
+            color: #c0392b;
+            font-size: 0.82rem;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .error-msg.visible { display: block; }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #1a5276;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: background 0.15s;
+        }
+        .btn-login:hover { background: #154360; }
+
+        .hint {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #aaa;
+            margin-top: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo">🚖</div>
+            <h1>Putra Student Cab</h1>
+            <p>Sign in to continue</p>
+        </div>
+
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="field-group">
+                <label for="studentId">Student ID</label>
+                <input type="text" id="studentId" placeholder="e.g. 213456" autocomplete="off" required/>
+            </div>
+
+            <div class="field-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required/>
+            </div>
+
+            <div class="error-msg" id="errorMsg">Please enter both Student ID and Password.</div>
+
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+
+        <p class="hint">Demo login — any Student ID and Password will work.</p>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const studentId = document.getElementById('studentId').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!studentId || !password) {
+                errorMsg.classList.add('visible');
+                return false;
+            }
+
+            errorMsg.classList.remove('visible');
+            sessionStorage.setItem('studentId', studentId);
+            window.location.href = 'index.html';
+            return false;
+        }
+    </script>
+</body>
+</html>

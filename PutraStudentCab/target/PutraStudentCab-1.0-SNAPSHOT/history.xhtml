@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <title>Trip History — Putra Student Cab</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; color: #333; }
+        .app-header {
+            background: #1a5276; color: white; padding: 14px 24px;
+            font-size: 1.2rem; font-weight: 600; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .app-header a { color: #cfe2f3; text-decoration: none; font-size: 0.85rem; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .summary-card {
+            background: white; border-radius: 10px; padding: 18px 22px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .summary-card .label { font-size: 0.85rem; color: #888; }
+        .summary-card .value { font-size: 1.6rem; font-weight: 700; color: #1e8449; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        th { background: #1a5276; color: white; text-align: left; padding: 12px 16px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.4px; }
+        td { padding: 12px 16px; border-top: 1px solid #f0f0f0; font-size: 0.9rem; }
+        tr:hover td { background: #f9fafc; }
+        .fare-cell { font-weight: 600; color: #e67e22; }
+    </style>
+</h:head>
+<h:body>
+    <div class="app-header">
+        <span>📋 Trip History</span>
+        <a href="index.html">← Back to Fare Estimator</a>
+    </div>
+
+    <div class="container">
+
+        <div class="summary-card">
+            <div>
+                <div class="label">Total Trips</div>
+                <div class="value">#{tripHistoryBean.trips.size()}</div>
+            </div>
+            <div>
+                <div class="label">Total Fare Collected</div>
+                <div class="value">RM #{tripHistoryBean.totalFareCollectedFormatted}</div>
+            </div>
+        </div>
+
+        <h:dataTable value="#{tripHistoryBean.trips}" var="trip" style="width:100%">
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{trip.id}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Origin</f:facet>
+                #{trip.originDisplay}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Destination</f:facet>
+                #{trip.destDisplay}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Distance (km)</f:facet>
+                #{trip.distanceKmFormatted}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Duration (min)</f:facet>
+                #{trip.durationMinFormatted}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Fare (RM)</f:facet>
+                <span class="fare-cell">#{trip.fareFormatted}</span>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Date</f:facet>
+                #{trip.createdAtFormatted}
+            </h:column>
+        </h:dataTable>
+
+    </div>
+</h:body>
+</html>
